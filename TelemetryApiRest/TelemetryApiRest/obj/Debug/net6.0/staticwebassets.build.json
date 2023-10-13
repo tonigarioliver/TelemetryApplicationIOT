@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "hZR7vkO8WlVm2QXUTT712C8RmzfacfoI1GlGs3+g9jE=",
+  "Source": "TelemetryApiRest",
+  "BasePath": "_content/TelemetryApiRest",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,0 +1,97 @@
+﻿@page "/"
+@using TelemetryAppSeverIOT.Data;
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<PageTitle>Index</PageTitle>
+
+<h1>Temperature Telemetries Plot</h1>
+<div id="tempchart"></div>
+<div>
+    @if (deviceModels != null)
+    {
+        @foreach (var deviceModel in deviceModels)
+        {
+            <input type="checkbox" id="@deviceModel.SerialNumber"
+                   data-serial-number="@deviceModel.SerialNumber"
+                   data-label="@deviceModel.Name"
+            @onchange="() => ToggleDeviceModel(deviceModel.SerialNumber)"
+                   checked="@selectedDeviceModels.Contains(deviceModel.SerialNumber)" />
+            <label for="@deviceModel.SerialNumber">@deviceModel.Name</label>
+            <br />
+        }
+    }
+</div>
+
+@code {
+    HubConnection hubConnection;
+    List<DeviceModel> deviceModels;
+    List<string> selectedDeviceModels = new List<string>();
+    List<string> selectedDeviceNames = new List<string>();
+    List<string> topics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch device models from your API
+        deviceModels = await HttpClient.GetFromJsonAsync<List<DeviceModel>>("http://localhost:5012/api/Device/GetAllDevices");
+        topics = deviceModels.Select(x => x.SerialNumber).ToList();
+
+    }
+
+    private void ToggleDeviceModel(string serialNumber)
+    {
+        if (selectedDeviceNames.Contains(serialNumber))
+        {
+            selectedDeviceNames.Remove(serialNumber);
+        }
+        else
+        {
+            selectedDeviceNames.Add(serialNumber);
+        }
+        hubConnection.StopAsync();
+        hubConnection.DisposeAsync();
+
+        var selectedDeviceTopics = deviceModels
+            .Where(dm => selectedDeviceNames.Contains(dm.SerialNumber))
+            .Select(dm => dm.SerialNumber)
+            .ToList();
+        selectedDeviceTopics.ForEach(t => Console.WriteLine(t));
+
+        var topicsQueryString = string.Join("&", selectedDeviceTopics.Select(topic => $"topics={topic}"));
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl($"http://localhost:5012/deviceMessage?{topicsQueryString}")
+            .Build();
+
+        foreach (var topic in selectedDeviceTopics)
+        {
+            hubConnection.On<string, string>(topic,
+                async (topic, payload) =>
+                {
+                    var msg = $"{topic}:{payload}";
+                    Console.WriteLine(msg);
+                    await JSRuntime.InvokeVoidAsync("extendplot", "tempchart",topics.IndexOf(topic), payload);
+                });
+        }
+
+        hubConnection.StartAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            deviceModels = await HttpClient.GetFromJsonAsync<List<DeviceModel>>("http://localhost:5012/api/Device/GetAllDevices");
+            topics = deviceModels.Select(x => x.Name).ToList();
+            await JSRuntime.InvokeVoidAsync("createplot", "tempchart", topics);
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"http://localhost:5012/deviceMessage")
+                .Build();
+
+            await hubConnection.StartAsync();
+        }
+    }
+}
