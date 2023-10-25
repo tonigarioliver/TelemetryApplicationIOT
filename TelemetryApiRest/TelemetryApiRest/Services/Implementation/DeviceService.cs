@@ -23,32 +23,42 @@ namespace TelemetryApiRest.Services.Implementation
 
         public async Task<DeviceServiceResponse> RegisterNewDevice(RegisterNewDeviceDTO newDeviceDTO)
         {
-            if (newDeviceDTO == null)
+            try
+            {
+                if (newDeviceDTO == null)
+                {
+                    return new DeviceServiceResponse()
+                    {
+                        device = null,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Errormessage = "Null reference"
+                    };
+                }
+                DeviceModel newDevice = mapper.Map<DeviceModel>(newDeviceDTO);
+                if (await unitOfWork.DeviceRepository.GetAsync(u => u.SerialNumber.ToLower() == newDevice.SerialNumber.ToLower()) != null)
+                {
+                    return new DeviceServiceResponse()
+                    {
+                        device = newDevice,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Errormessage = "DeviceAlreadyExists"
+                    };
+                }
+                await unitOfWork.DeviceRepository.CreateAsync(mapper.Map<Device>(newDevice));
+                await unitOfWork.CompleteAsync();
+                return new DeviceServiceResponse()
+                {
+                    device = newDevice,
+                    StatusCode = StatusCodes.Status201Created
+                };
+            }catch(Exception ex)
             {
                 return new DeviceServiceResponse()
                 {
                     device = null,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Errormessage = "Null reference"
+                    StatusCode = StatusCodes.Status500InternalServerError
                 };
             }
-            DeviceModel newDevice = mapper.Map<DeviceModel>(newDeviceDTO);
-            if (await unitOfWork.DeviceRepository.GetAsync(u => u.SerialNumber.ToLower()==newDevice.SerialNumber.ToLower()) != null)
-            {
-                return new DeviceServiceResponse()
-                {
-                    device = newDevice,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Errormessage = "DeviceAlreadyExists"
-                };
-            }
-            await unitOfWork.DeviceRepository.CreateAsync(mapper.Map<Device>(newDevice));
-            await unitOfWork.CompleteAsync();
-            return new DeviceServiceResponse()
-            {
-                device = newDevice,
-                StatusCode = StatusCodes.Status201Created
-            };
         }
 
         public async Task<DeviceServiceResponse> UpdateDevice(DeviceModel updateDevice, string serialNumber)
@@ -89,5 +99,34 @@ namespace TelemetryApiRest.Services.Implementation
             var devices = await unitOfWork.DeviceRepository.GetAllAsync();
             return mapper.Map<List<DeviceModel>>(devices);
         }
+
+        public async Task<DeviceServiceResponse> RemoveAsync(string serialNumber)
+        {
+            DeviceServiceResponse response = new DeviceServiceResponse();
+            try
+            {
+                // Buscar el cliente existente por nombre
+                var existingDevice = await unitOfWork.DeviceRepository.GetAsync(device => device.SerialNumber == serialNumber);
+
+                if (existingDevice != null)
+                {
+                    await unitOfWork.DeviceRepository.Delete(existingDevice); 
+                    await unitOfWork.CompleteAsync();
+                    response.StatusCode = StatusCodes.Status204NoContent;
+                }
+                else
+                {
+                    response.StatusCode = StatusCodes.Status404NotFound;
+                    response.Errormessage = $"Data not found{serialNumber}";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = StatusCodes.Status500InternalServerError;
+                response.Errormessage = ex.Message;
+            }
+            return response;
+        }
+
     }
 }

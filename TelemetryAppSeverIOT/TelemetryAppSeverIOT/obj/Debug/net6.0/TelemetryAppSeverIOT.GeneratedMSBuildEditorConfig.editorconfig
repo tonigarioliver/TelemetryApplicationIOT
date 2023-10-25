@@ -20,16 +20,16 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/FetchData.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
+[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/IOTDevices.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSU9URGV2aWNlcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/Index.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/IOTRealTime.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSU9UUmVhbFRpbWUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Shared/SurveyPrompt.razor]
@@ -50,6 +50,18 @@ build_metadata.AdditionalFiles.CssScope = b-luqz4z7va5
 
 [C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/SignIn.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2lnbkluLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/SignUp.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2lnblVwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/Welcome.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VsY29tZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/tonim/source/repos/TelemetryApplicationIOT/TelemetryAppSeverIOT/TelemetryAppSeverIOT/Pages/_Host.cshtml]

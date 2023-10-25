@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryApiRest", "TelemetryApiRest\TelemetryApiRest.csproj", "{EE1DDF64-D87A-4578-B92E-FB7FF7C13599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelemetryApiRest", "TelemetryApiRest\TelemetryApiRest.csproj", "{EE1DDF64-D87A-4578-B92E-FB7FF7C13599}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryApiRestUnitTest", "TelemetryApiRestUnitTest\TelemetryApiRestUnitTest.csproj", "{9C46F2F0-17F4-4286-94A5-856EE0BEDDEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{EE1DDF64-D87A-4578-B92E-FB7FF7C13599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE1DDF64-D87A-4578-B92E-FB7FF7C13599}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE1DDF64-D87A-4578-B92E-FB7FF7C13599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C46F2F0-17F4-4286-94A5-856EE0BEDDEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C46F2F0-17F4-4286-94A5-856EE0BEDDEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C46F2F0-17F4-4286-94A5-856EE0BEDDEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C46F2F0-17F4-4286-94A5-856EE0BEDDEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

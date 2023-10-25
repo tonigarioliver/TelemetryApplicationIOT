@@ -1,0 +1,149 @@
+﻿@page "/IOTDevices"
+
+<PageTitle>IOT Devices</PageTitle>
+@inject IJSRuntime JSRuntime
+@using TelemetryApiRest.Models.DTO;
+@using TelemetryAppSeverIOT.Data
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+
+@inject DeviceService deviceService
+
+<h1>Iot Available Devices</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (devices == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>SerialNumber</th>
+                <th>Vendor</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var device in devices)
+            {
+                <tr>
+                    <td>@device.Name</td>
+                    <td>@device.SerialNumber</td>
+                    <td>@device.Vendor</td>
+                    <td>@device.Status</td>
+                    <td>
+                        <button class="btn btn-link" @onclick="() => EditDevice(device)">Edit</button>
+                        <button class="btn btn-danger btn-lg btn-block mt-2" @onclick="() => ConfirmDeleteDevice(device)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (isEditing)
+{
+    <h2>Edit Device</h2>
+    <EditForm Model="editDevice" OnValidSubmit="UpdateDevice">
+        <DataAnnotationsValidator />
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <InputText id="Name" @bind-Value="editDevice.Name" class="form-control" />
+            <ValidationMessage For="() => editDevice.Name" />
+        </div>
+        <div class="form-group">
+            <label for="SerialNumber">Serial Number</label>
+            <InputText id="SerialNumber" @bind-Value="editDevice.SerialNumber" class="form-control" />
+            <ValidationMessage For="() => editDevice.SerialNumber" />
+        </div>
+        <div class="form-group">
+            <label for="Vendor">Vendor</label>
+            <InputText id="Vendor" @bind-Value="editDevice.Vendor" class="form-control" />
+            <ValidationMessage For="() => editDevice.Vendor" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </EditForm>
+}
+<h2>Add New Device</h2>
+<EditForm Model="newDevice" OnValidSubmit="AddDevice">
+    <DataAnnotationsValidator />
+
+    <div asp-validation-summary="All"></div> <!-- Validation summary for all fields -->
+
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <InputText id="Name" @bind-Value="newDevice.Name" class="form-control" />
+        <ValidationMessage For="() => newDevice.Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for "SerialNumber">Serial Number</label>
+        <InputText id="SerialNumber" @bind-Value="newDevice.SerialNumber" class="form-control" />
+        <ValidationMessage For="() => newDevice.SerialNumber" />
+        <span asp-validation-for="SerialNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Vendor">Vendor</label>
+        <InputText id="Vendor" @bind-Value="newDevice.Vendor" class="form-control" />
+        <ValidationMessage For="() => newDevice.Vendor" />
+        <span asp-validation-for="Vendor" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Device</button>
+</EditForm>
+
+
+
+@code {
+    List<DeviceModel> devices;
+    private RegisterNewDeviceDTO newDevice = new RegisterNewDeviceDTO();
+    private DeviceModel editDevice;
+    private bool isEditing;
+
+    protected override async Task OnInitializedAsync()
+    {
+        devices = await deviceService.GetDevicesAsync();
+    }
+    private void EditDevice(DeviceModel device)
+    {
+        editDevice = device;
+        isEditing = true;
+    }
+    private async Task UpdateDevice()
+    {
+        // Implementar la actualización del dispositivo en el servicio
+        await deviceService.UpdateDeviceAsync(editDevice);
+        editDevice = null;
+        isEditing = false;
+        devices = await deviceService.GetDevicesAsync();
+    }
+
+    private async Task AddDevice()
+    {
+        // Agrega el nuevo dispositivo a tu servicio aquí
+        await deviceService.AddDeviceAsync(newDevice);
+        newDevice = new RegisterNewDeviceDTO(); // Limpia el formulario
+        devices = await deviceService.GetDevicesAsync(); // Actualiza la lista de dispositivos
+    }
+    private async Task ConfirmDeleteDevice(DeviceModel device)
+    {
+        var message = new object[] { "Are you sure you want to delete this device?" };
+        var confirmResult = await JSRuntime.InvokeAsync<bool>("confirm", message);
+
+        if (confirmResult)
+        {
+            await deviceService.DeleteDeviceAsync(device.SerialNumber);
+            devices = await deviceService.GetDevicesAsync();
+        }
+    }
+
+
+
+}
