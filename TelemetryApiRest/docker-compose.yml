@@ -1,0 +1,51 @@
+version: '3.8'
+
+networks:
+ dev:
+    driver: bridge
+
+services:
+
+ database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: iotapp
+    ports:
+      - "5433:5432"
+    restart: always
+    volumes:
+      - app_data:/var/lib/postrgresql/data
+    networks:
+      - dev
+
+ rabbitmq:
+    image: "rabbitmq:management"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  # Puerto de RabbitMQ
+      - "15672:15672"  # Puerto para la interfaz web de RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - dev
+
+ historicaldataservice:
+    image: docker.io/library/historicaldataiotservice:latest
+    container_name: historicaldataservice
+    build:
+      context: ./IOTHistoricalDataService
+      dockerfile: Dockerfile
+    depends_on:
+      - "database"
+      - "rabbitmq"
+    networks:
+      - dev
+
+
+  
+volumes:
+  app_data:
