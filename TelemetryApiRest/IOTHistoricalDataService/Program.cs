@@ -68,6 +68,7 @@ class Program
             var mqttService = scope.ServiceProvider.GetRequiredService<NewDataMQTTProcess>();
             var rabbitMQManager = scope.ServiceProvider.GetRequiredService<RabbitMQManager>();
             var deviceService = scope.ServiceProvider.GetRequiredService<IDeviceService>();
+            var eventProcessor = scope.ServiceProvider.GetRequiredService<IEventProcessor>();
             var devices = await deviceService.GetAllDevices();
             foreach (var device in devices)
                 Console.WriteLine(device.SerialNumber);
@@ -75,6 +76,10 @@ class Program
             var message = Encoding.UTF8.GetBytes("Mensaje de prueba");
             rabbitMQManager.Subscribe("device", message => Console.WriteLine(Encoding.UTF8.GetString(message)));
             rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: message);
+            rabbitMQManager.Subscribe("add", async message =>
+                                                            await eventProcessor.ProcessEventAsync(new AddDevice(Encoding.UTF8.GetString(message))));
+            rabbitMQManager.Subscribe("delete", async message =>
+                                                await eventProcessor.ProcessEventAsync(new AddDevice(Encoding.UTF8.GetString(message))));
 
             var cancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = cancellationTokenSource.Token;

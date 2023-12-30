@@ -18,6 +18,7 @@ namespace IOTHistoricalDataService.EventProcessing
         }
         public async Task ProcessEventAsync(EventBase @event)
         {
+            var mqttService = serviceProvider.GetService<NewDataMQTTProcess>();
             switch (@event.EventType)
             {
                 case EventType.MqttBackgroundMessageReceived:
@@ -28,11 +29,7 @@ namespace IOTHistoricalDataService.EventProcessing
                             .GetAsync(d => d.SerialNumber == ((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
                         if (exisitngDevice == null)
                         {
-                            using (var mqttRealTimeScope = serviceProvider.CreateScope())
-                            {
-                                var mqttRealTimeService = mqttRealTimeScope.ServiceProvider.GetService<NewDataMQTTProcess>();
-                                mqttRealTimeService.RemoveSubscription(((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
-                            }
+                            mqttService.RemoveSubscription(((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
                         }
                         else
                         {
@@ -49,9 +46,17 @@ namespace IOTHistoricalDataService.EventProcessing
                     break;
 
                 case EventType.DeleteDevice:
+                    if (mqttService != null)
+                    {
+                        await mqttService.RemoveSubscription(((DeleteDevice)@event).deviceSerialNumber);
+                    }
                     break;
 
                 case EventType.AddDevice:
+                    if (mqttService != null)
+                    {
+                        await mqttService.AddSubscription(((AddDevice)@event).deviceSerialNumber);
+                    }
                     break;
             }
         }

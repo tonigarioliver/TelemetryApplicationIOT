@@ -52,14 +52,14 @@ namespace TelemetryApiRest.EventProcessing
                 case EventType.DeleteDevice:
                     if (rabbitMQManager != null)
                     {
-                        rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: Encoding.UTF8.GetBytes("delete"));
+                        rabbitMQManager.PublishMessage(exchange: "", routingKey: "delete", messageBody: Encoding.UTF8.GetBytes(((DeleteDevice)@event).deviceSerialNumber));
                     }
                     break;
 
                 case EventType.AddDevice:
                     if (rabbitMQManager != null)
                     {
-                        rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: Encoding.UTF8.GetBytes("add"));
+                        rabbitMQManager.PublishMessage(exchange: "", routingKey: "add", messageBody: Encoding.UTF8.GetBytes(((AddDevice)@event).deviceSerialNumber));
                     }
                     break;
 
