@@ -1,6 +1,7 @@
 ﻿
 using IOTHistoricalDataService.COR;
 using IOTHistoricalDataService.Entity;
+using IOTHistoricalDataService.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
@@ -25,19 +26,32 @@ namespace IOTHistoricalDataService.EventProcessing
                         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                         Device exisitngDevice = await unitOfWork.DeviceRepository
                             .GetAsync(d => d.SerialNumber == ((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
-                        /*if (exisitngDevice == null)
+                        if (exisitngDevice == null)
                         {
-                            RemoveSubscription(topic);
-                        }*/
-                        DeviceRecord newRecord = new DeviceRecord
+                            using (var mqttRealTimeScope = serviceProvider.CreateScope())
+                            {
+                                var mqttRealTimeService = mqttRealTimeScope.ServiceProvider.GetService<NewDataMQTTProcess>();
+                                mqttRealTimeService.RemoveSubscription(((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
+                            }
+                        }
+                        else
                         {
-                            device = exisitngDevice,
-                            lastRecord = ((MqttBackgroundMessageReceivedEvent)@event).message
-                        };
+                            DeviceRecord newRecord = new DeviceRecord
+                            {
+                                device = exisitngDevice,
+                                lastRecord = ((MqttBackgroundMessageReceivedEvent)@event).message
+                            };
 
-                        await unitOfWork.DeviceRecordsRepository.CreateAsync(newRecord);
-                        await unitOfWork.CompleteAsync();
+                            await unitOfWork.DeviceRecordsRepository.CreateAsync(newRecord);
+                            await unitOfWork.CompleteAsync();
+                        }
                     }
+                    break;
+
+                case EventType.DeleteDevice:
+                    break;
+
+                case EventType.AddDevice:
                     break;
             }
         }

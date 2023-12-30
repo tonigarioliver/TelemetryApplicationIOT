@@ -4,5 +4,7 @@
     {
         RealTimeMessageReceived,
         MqttBackgroundMessageReceived,
+        DeleteDevice,
+        AddDevice
     }
 }

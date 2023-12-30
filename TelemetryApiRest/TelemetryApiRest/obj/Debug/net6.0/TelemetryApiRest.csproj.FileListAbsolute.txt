@@ -65,3 +65,4 @@ C:\Users\tonim\source\repos\TelemetryApplicationIOT\TelemetryApiRest\TelemetryAp
 C:\Users\tonim\source\repos\TelemetryApplicationIOT\TelemetryApiRest\TelemetryApiRest\bin\Debug\net6.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 C:\Users\tonim\source\repos\TelemetryApplicationIOT\TelemetryApiRest\TelemetryApiRest\bin\Debug\net6.0\System.CodeDom.dll
 C:\Users\tonim\source\repos\TelemetryApplicationIOT\TelemetryApiRest\TelemetryApiRest\bin\Debug\net6.0\MQTTnet.dll
+C:\Users\tonim\source\repos\TelemetryApplicationIOT\TelemetryApiRest\TelemetryApiRest\bin\Debug\net6.0\RabbitMQ.Client.dll

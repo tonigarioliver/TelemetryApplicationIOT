@@ -9,6 +9,7 @@ using Xunit;
 using TelemetryApiRest.Models;
 using TelemetryApiRestUnitTest.MockData;
 using TelemetryApiRest.Entity;
+using TelemetryApiRest.EventProcessing;
 
 public class DeviceControllerTests
 {
@@ -18,12 +19,13 @@ public class DeviceControllerTests
         // Arrange
         var deviceServiceMock = new Mock<IDeviceService>();
         var environmentMock = new Mock<IWebHostEnvironment>();
+        var eventProcesorMock=new Mock<IEventProcessor>();
 
         // Create a list of sample devices
         var sampleDevices = DeviceMockData.GetSampleDevicesModel();
 
         deviceServiceMock.Setup(_ => _.GetAllDevices()).ReturnsAsync(sampleDevices);
-        var controller = new DeviceController(deviceServiceMock.Object, environmentMock.Object);
+        var controller = new DeviceController(deviceServiceMock.Object, environmentMock.Object, eventProcesorMock.Object);
 
         // Act
         var result = await controller.GetAll();
@@ -39,7 +41,8 @@ public class DeviceControllerTests
         // Arrange
         var deviceServiceMock = new Mock<IDeviceService>();
         var environmentMock = new Mock<IWebHostEnvironment>();
-        var controller = new DeviceController(deviceServiceMock.Object, environmentMock.Object);
+        var eventProcesorMock = new Mock<IEventProcessor>();
+        var controller = new DeviceController(deviceServiceMock.Object, environmentMock.Object, eventProcesorMock.Object);
         var sampleDevices = DeviceMockData.GetSampleDevicesModel();
         var expectedResponse = DeviceMockData.GetCreatedResponse();
         var newDeviceDTO = DeviceMockData.GetNewDevice();
@@ -63,7 +66,8 @@ public class DeviceControllerTests
         // Arrange
         var deviceServiceMock = new Mock<IDeviceService>();
         var environmentMock = new Mock<IWebHostEnvironment>();
-        var controller = new DeviceController(deviceServiceMock.Object, environmentMock.Object);
+        var eventProcesorMock = new Mock<IEventProcessor>();
+        var controller = new DeviceController(deviceServiceMock.Object, environmentMock.Object, eventProcesorMock.Object);
         var serialNumber = "12345";
         var update = new DeviceModel
         {

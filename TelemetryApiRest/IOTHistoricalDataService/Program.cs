@@ -73,14 +73,14 @@ class Program
                 Console.WriteLine(device.SerialNumber);
             // Suscribirse a mensajes
             var message = Encoding.UTF8.GetBytes("Mensaje de prueba");
-            rabbitMQManager.Subscribe("mi_cola", message => Console.WriteLine(Encoding.UTF8.GetString(message)));
-            rabbitMQManager.PublishMessage(exchange: "", routingKey: "mi_cola", messageBody: message);
+            rabbitMQManager.Subscribe("device", message => Console.WriteLine(Encoding.UTF8.GetString(message)));
+            rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: message);
 
             var cancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
             await mqttService.ExecuteAsync(cancellationToken);
             // Mantén la aplicación en ejecución
-            rabbitMQManager.PublishMessage(exchange: "", routingKey: "mi_cola", messageBody: message);
+            rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: message);
             while (true) ;
         }
     }

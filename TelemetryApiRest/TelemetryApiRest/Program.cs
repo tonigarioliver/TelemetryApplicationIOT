@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using TelemetryApiRest.Config;
 using TelemetryApiRest.COR;
 using TelemetryApiRest.Data;
@@ -12,16 +13,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<MQTTSettings>(builder.Configuration.GetSection("MQTTSettings"));
+builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQSettings"));
+
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<TelemetryApiDbContext>(
     options =>
     options.UseNpgsql(connection)
 ); //
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDeviceService,DeviceService>();
 builder.Services.AddSingleton<IMqttListenerServiceRealTime, MqttListenerServiceRealTime>();
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+builder.Services.AddSingleton<RabbitMQManager>();
 builder.Services.AddHostedService<MqttBackgroundService>();
 
 builder.Services.AddControllers();

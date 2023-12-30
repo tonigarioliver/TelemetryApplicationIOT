@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using System.Text;
 using System.Text.Json;
 using TelemetryApiRest.COR;
 using TelemetryApiRest.Entity;
+using TelemetryApiRest.Services;
+using TelemetryApiRest.Services.Implementation;
 using TelemetryApp.Hubs;
 
 namespace TelemetryApiRest.EventProcessing
@@ -19,6 +22,7 @@ namespace TelemetryApiRest.EventProcessing
         }
         public async Task ProcessEventAsync(EventBase @event)
         {
+            var rabbitMQManager = serviceProvider.GetRequiredService<RabbitMQManager>();
             switch (@event.EventType)
             {
                 case EventType.MqttBackgroundMessageReceived:
@@ -27,20 +31,38 @@ namespace TelemetryApiRest.EventProcessing
                         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                         Device exisitngDevice = await unitOfWork.DeviceRepository
                             .GetAsync(d => d.SerialNumber == ((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
-                        /*if (exisitngDevice == null)
+                        if (exisitngDevice == null)
                         {
-                            RemoveSubscription(topic);
-                        }*/
-                        DeviceRecord newRecord = new DeviceRecord
+                           var mqttRealTimeService = serviceProvider.GetService<IMqttListenerServiceRealTime>();
+                           await mqttRealTimeService.RemoveSubscription(((MqttBackgroundMessageReceivedEvent)@event).deviceSerialNumber);
+                        }
+                        else
                         {
-                            device = exisitngDevice,
-                            lastRecord = ((MqttBackgroundMessageReceivedEvent)@event).message
-                        };
+                            DeviceRecord newRecord = new DeviceRecord
+                            {
+                                device = exisitngDevice,
+                                lastRecord = ((MqttBackgroundMessageReceivedEvent)@event).message
+                            };
 
-                        await unitOfWork.DeviceRecordsRepository.CreateAsync(newRecord);
-                        await unitOfWork.CompleteAsync();
+                            await unitOfWork.DeviceRecordsRepository.CreateAsync(newRecord);
+                            await unitOfWork.CompleteAsync();
+                        }
                     }
                     break;
+                case EventType.DeleteDevice:
+                    if (rabbitMQManager != null)
+                    {
+                        rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: Encoding.UTF8.GetBytes("delete"));
+                    }
+                    break;
+
+                case EventType.AddDevice:
+                    if (rabbitMQManager != null)
+                    {
+                        rabbitMQManager.PublishMessage(exchange: "", routingKey: "device", messageBody: Encoding.UTF8.GetBytes("add"));
+                    }
+                    break;
+
                 case EventType.RealTimeMessageReceived:      
                     string topic= ((RealTimeMessageReceivedEvent)@event).deviceSerialNumber;
                     string device= ((RealTimeMessageReceivedEvent)@event).deviceSerialNumber;

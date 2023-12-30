@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using TelemetryApiRest.Entity;
+using TelemetryApiRest.EventProcessing;
 using TelemetryApiRest.Models;
 using TelemetryApiRest.Models.DTO;
 using TelemetryApiRest.Services;
@@ -13,10 +15,13 @@ namespace TelemetryApiRest.Controllers
     {
         private IDeviceService deviceService;
         private readonly IWebHostEnvironment environment;
-        public DeviceController(IDeviceService deviceService, IWebHostEnvironment environment)
+        private readonly IEventProcessor eventProcessor;
+        private IServiceProvider serviceProvider;
+        public DeviceController(IDeviceService deviceService, IWebHostEnvironment environment, IEventProcessor eventProcessor)
         {
             this.deviceService = deviceService;
             this.environment = environment;
+            this.eventProcessor = eventProcessor;
         }
         [HttpGet]
         [Route("GetAllDevices")]
@@ -44,6 +49,7 @@ namespace TelemetryApiRest.Controllers
             switch (response.StatusCode)
             {
                 case StatusCodes.Status201Created:
+                    await eventProcessor.ProcessEventAsync(new AddDevice(newDevice.SerialNumber));
                     return StatusCode(StatusCodes.Status201Created);
                 case StatusCodes.Status500InternalServerError:
                     return StatusCode(StatusCodes.Status500InternalServerError, response);
@@ -90,6 +96,7 @@ namespace TelemetryApiRest.Controllers
             switch (response.StatusCode)
             {
                 case StatusCodes.Status204NoContent:
+                    await eventProcessor.ProcessEventAsync(new DeleteDevice(serialNumber));
                     result = NoContent();
                     break;
                 case StatusCodes.Status500InternalServerError:
